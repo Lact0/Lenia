@@ -13,8 +13,8 @@ SDL_Surface *screen = nullptr;
 const int targetFPS = 60;
 const int frameDelay = 1000 / targetFPS;
 
-const int windowWidth = 800;
-const int windowHeight = 800;
+const int windowWidth = 100;
+const int windowHeight = 100;
 const double windowScale = 1;
 
 bool startup() {
@@ -26,7 +26,7 @@ bool startup() {
             SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
             windowWidth * windowScale, windowHeight * windowScale, SDL_WINDOW_SHOWN);
     screen = SDL_GetWindowSurface(window);
-
+ 
     return true;
 }
 
@@ -36,11 +36,27 @@ void quit() {
     SDL_Quit();
 }
 
+void setNoise(vector<double>* arr) {
+    for(int i = 0; i < arr->size(); i++) {
+        (*arr)[i] = ((double) rand() / (RAND_MAX));
+    }
+}
+
+double clamp(double n) {
+    if(n > 1) {
+        return 1;
+    }
+    if(n < 0) {
+        return 0;
+    }
+    return n;
+}
+
 int main(int argv, char** args) {
 
-    ExpK k(windowWidth, windowHeight, 4, 50, vector<double>({1}));
-
-    cout << "Finished making the kernal!!";
+    ExpK k(windowWidth, windowHeight, 4, 50, vector<double>({.5, 1, .5}));
+    cout << "Finished making the kernal!!\n";
+    ExpGF g(.25, .03);
 
     if(!startup()) {
         return 1;
@@ -52,10 +68,10 @@ int main(int argv, char** args) {
     bool running = true;
     int frameStart, frameTime;
 
-    vector<vector<double>> grid;
+    vector<double> grid(windowWidth * windowHeight, 0);
+    setNoise(&grid);
 
-    ExpGF g(.25, .03);
-    
+    int tick = 0;
     while(running) {
         frameStart = SDL_GetTicks();
 
@@ -81,12 +97,25 @@ int main(int argv, char** args) {
             }
         }
 
-        uint8_t* pixels = (uint8_t*) screen->pixels;
 
         //Update
+        double dt = 1 / targetFPS;
+        cout << "convolving...\n";
+        vector<double> conv = k.convolve(grid);
+        cout << "growing...\n";
+        vector<double> growth = g.growth(conv);
+        cout << "updating...\n";
+        for(int i = 0; i < grid.size(); i++) {
+            grid[i] = clamp(grid[i] + dt * growth[i]);
+        }
+
+        //Draw
+        uint8_t* pixels = (uint8_t*) screen->pixels;
+
         for(int i = 0; i < windowWidth; i++) {
             for(int j = 0; j < windowHeight; j++) {
-                uint8_t col = (uint8_t) (255 * k.getKernalPoint(x, y, i, j) * 1000);
+                //uint8_t col = (uint8_t) (255 * k.getKernalPoint(x, y, i, j) * 1000);
+                uint8_t col = (uint8_t) (255 * grid[i * windowWidth + j]);
                 int ind = j * screen->pitch + i * screen->format->BytesPerPixel;
                 pixels[ind] = col;
                 pixels[ind + 1] = col;

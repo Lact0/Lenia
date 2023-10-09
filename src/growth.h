@@ -1,8 +1,12 @@
 #pragma once
+#include <vector>
+
+using namespace std;
 
 class GrowthFunc {
     public:
-        virtual double growth(double u) = 0;
+        virtual vector<double> growth(vector<double> u) = 0;
+        virtual double singleGrowth(double u) = 0;
 };
 
 class ExpGF : public GrowthFunc {
@@ -11,5 +15,6 @@ class ExpGF : public GrowthFunc {
         double sigma;
 
         ExpGF(double m, double s);
-        double growth(double u);
+        vector<double> growth(vector<double> u);
+        double singleGrowth(double u);
 };

@@ -13,7 +13,14 @@ ExpK::ExpK(int w, int h, double a, double r, vector<double> p) {
 }
 
 vector<double> ExpK::convolve(vector<double> grid) {
-    vector<double> convolution;
+    int size = width * height;
+    vector<double> convolution(size, 0);
+    for(int i = 0; i < size; i++) {
+        int offset = size - i;
+        for(int j = 0; j < size; j++) {
+            convolution[i] += grid[j] * kernal[(offset + j) % size];
+        }
+    }
     return convolution;
 }
 

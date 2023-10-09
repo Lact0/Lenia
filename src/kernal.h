@@ -25,6 +25,7 @@ class ExpK : public Kernal {
         double mag;
         vector<double> kernal;
 
+        void workerConvolve(vector<double> grid, vector<double>* conv, int ind, int jmp);
         void genKernal();
         
 };

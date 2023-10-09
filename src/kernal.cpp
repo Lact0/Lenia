@@ -1,6 +1,7 @@
 #include "kernal.h"
 #include <cmath>
 #include <iostream>
+#include <thread>
 
 ExpK::ExpK(int w, int h, double a, double r, vector<double> p) {
     width = w;
@@ -13,15 +14,26 @@ ExpK::ExpK(int w, int h, double a, double r, vector<double> p) {
 }
 
 vector<double> ExpK::convolve(vector<double> grid) {
-    int size = width * height;
-    vector<double> convolution(size, 0);
-    for(int i = 0; i < size; i++) {
+    vector<double> conv(grid.size(), 0);
+    int numThreads = thread::hardware_concurrency();
+    thread threads[numThreads];
+    for(int i = 0; i < numThreads; i++) {
+        threads[i] = thread(&ExpK::workerConvolve, this, grid, &conv, i, numThreads);
+    }
+    for(int i = 0; i < numThreads; i++) {
+        threads[i].join();
+    }
+    return conv;
+}
+
+void ExpK::workerConvolve(vector<double> grid, vector<double>* conv, int ind, int jmp) {
+    int size = grid.size();
+    for(int i = ind; i < size; i += jmp) {
         int offset = size - i;
         for(int j = 0; j < size; j++) {
-            convolution[i] += grid[j] * kernal[(offset + j) % size];
+            (*conv)[i] += grid[j] * kernal[(offset + j) % size];
         }
     }
-    return convolution;
 }
 
 void ExpK::genKernal() {

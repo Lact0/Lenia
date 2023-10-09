@@ -10,11 +10,12 @@ using namespace std;
 SDL_Window *window = nullptr;
 SDL_Surface *screen = nullptr;
 
-const int targetFPS = 10;
+const int targetFPS = 60;
 const int frameDelay = 1000 / targetFPS;
 
-const int windowWidth = 100;
-const int windowHeight = 100;
+//WIDTH AND HEIGHT MUST BE POWERS OF 2
+const int windowWidth = 128;
+const int windowHeight = 128;
 const double windowScale = 4;
 
 bool startup() {
@@ -72,11 +73,24 @@ void setCircle(vector<double>* arr, int width) {
     }
 }
 
+vector<int> mapColGrey(double n) {
+    int col = n * 255;
+    vector<int> colors({col, col, col});
+    return colors;
+}
+vector<int> mapColBGR(double n) {
+    int r = n * 255;
+    int g = (1 - abs(1 - 2 * n)) * 255;
+    int b = (1 - n) * 255;
+    vector<int> colors({b, g, r});
+    return colors;
+}
+
 int main(int argv, char** args) {
 
-    ExpK k(windowWidth, windowHeight, 4, 40, vector<double>({.5, 1}));
+    ExpK k(windowWidth, windowHeight, 4, 40, vector<double>({1, .5}));
     cout << "Finished making the kernal!!\n";
-    ExpGF g(.15, .015);
+    ExpGF g(.2, .015);
 
     if(!startup()) {
         return 1;
@@ -101,6 +115,8 @@ int main(int argv, char** args) {
 
         int x, y;
         SDL_GetMouseState(&x, &y);
+        x /= windowScale;
+        y /= windowScale;
 
         while(SDL_PollEvent(&e) != 0) {
             switch(e.type) {
@@ -113,6 +129,7 @@ int main(int argv, char** args) {
                 case SDL_KEYDOWN:
                     switch(e.key.keysym.sym) {
                         case SDLK_SPACE:
+
                             break;
                     }
                     break;
@@ -133,13 +150,13 @@ int main(int argv, char** args) {
         for(int i = 0; i < windowWidth; i++) {
             for(int j = 0; j < windowHeight; j++) {
                 //uint8_t col = (uint8_t) (255 * k.getKernalPoint(x, y, i, j) * 1000);
-                uint8_t col = (uint8_t) (255 * grid[i * windowWidth + j]);
+                vector<int> col = mapColBGR(grid[i + j * windowWidth]);
                 for(int k = 0; k < windowScale; k++) {
                     for(int l = 0; l < windowScale; l++) {
                         int ind = (j * windowScale + l) * screen->pitch + (i * windowScale + k) * screen->format->BytesPerPixel;
-                        pixels[ind] = col;
-                        pixels[ind + 1] = col;
-                        pixels[ind + 2] = col;
+                        pixels[ind] = col[0];
+                        pixels[ind + 1] = col[1];
+                        pixels[ind + 2] = col[2];
                     }
                 }
             }

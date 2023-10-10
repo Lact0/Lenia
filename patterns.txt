@@ -1,0 +1,6 @@
+EPILEPSY
+ExpK k(windowWidth, windowHeight, 4, 75, vector<double>({.25, 1, .75, 1}));
+ExpGF g(.15, .015);
+Circle w/ noise
+128 by 128
+

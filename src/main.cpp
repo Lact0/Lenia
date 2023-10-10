@@ -89,9 +89,7 @@ vector<int> mapColBGR(double n) {
     return colors;
 }
 
-void drawCreature(vector<double>* grid) {
-    int offsetX = 64;
-    int offsetY = 64;
+void drawCreature(vector<double>* grid, double offsetX, double offsetY) {
     for(int i = 0; i < 20; i++) {
         for(int j = 0; j < 20; j++) {
             (*grid)[(i + offsetX) + (j + offsetY) * windowWidth] = creature[i][j];
@@ -101,7 +99,7 @@ void drawCreature(vector<double>* grid) {
 
 int main(int argv, char** args) {
 
-    double speed = 6;
+    double speed = 5;
 
     ExpK k(windowWidth, windowHeight, 4, 13, vector<double>({1}));
     cout << "Finished making the kernal!!\n";
@@ -121,7 +119,9 @@ int main(int argv, char** args) {
     //setNoise(&grid);
     //setCircle(&grid, windowWidth);
     //multNoise(&grid);
-    drawCreature(&grid);
+    for(int i = 0; i < 1; i++) {
+        drawCreature(&grid, rand() % (windowWidth - 20), rand() % (windowHeight - 20));
+    }
 
     int tick = 0;
     while(running) {

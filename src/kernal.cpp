@@ -1,5 +1,4 @@
 #include "kernal.h"
-#include <cmath>
 #include <iostream>
 #include <thread>
 
@@ -13,12 +12,12 @@ ExpK::ExpK(int w, int h, double a, double r, vector<double> p) {
     genKernal();
 }
 
-vector<double> ExpK::convolve(vector<double> grid) {
+vector<double> Kernal::convolve(vector<double> grid) {
     vector<double> conv(grid.size(), 0);
     int numThreads = thread::hardware_concurrency();
     thread threads[numThreads];
     for(int i = 0; i < numThreads; i++) {
-        threads[i] = thread(&ExpK::workerConvolve, this, grid, &conv, i, numThreads);
+        threads[i] = thread(&Kernal::workerConvolve, this, grid, &conv, i, numThreads);
     }
     for(int i = 0; i < numThreads; i++) {
         threads[i].join();
@@ -26,7 +25,7 @@ vector<double> ExpK::convolve(vector<double> grid) {
     return conv;
 }
 
-void ExpK::workerConvolve(vector<double> grid, vector<double>* conv, int ind, int jmp) {
+void Kernal::workerConvolve(vector<double> grid, vector<double>* conv, int ind, int jmp) {
     int size = grid.size();
     for(int i = ind; i < size; i += jmp) {
         int offset = size - i;

@@ -99,8 +99,6 @@ void drawCreature(vector<double>* grid, double offsetX, double offsetY) {
 
 int main(int argv, char** args) {
 
-    double speed = 5;
-
     ExpK k(windowWidth, windowHeight, 4, 13, vector<double>({1}));
     cout << "Finished making the kernal!!\n";
     ExpGF g(.15, .02);
@@ -119,9 +117,7 @@ int main(int argv, char** args) {
     //setNoise(&grid);
     //setCircle(&grid, windowWidth);
     //multNoise(&grid);
-    for(int i = 0; i < 1; i++) {
-        drawCreature(&grid, rand() % (windowWidth - 20), rand() % (windowHeight - 20));
-    }
+    drawCreature(&grid, 54, 54);
 
     int tick = 0;
     while(running) {
@@ -145,7 +141,7 @@ int main(int argv, char** args) {
                 case SDL_KEYDOWN:
                     switch(e.key.keysym.sym) {
                         case SDLK_SPACE:
-                            grid[x + y * windowWidth] = 1;
+                            drawCreature(&grid, min(max(x, 0), windowWidth - 20), min(max(y, 0), windowHeight - 20));
                             break;
                     }
                     break;
@@ -153,7 +149,7 @@ int main(int argv, char** args) {
         }
 
         //Update
-        double dt = 1 / (double)targetFPS * speed;
+        double dt = 1.0 / 12;
         vector<double> conv = k.convolve(grid);
         vector<double> growth = g.growth(conv);
         for(int i = 0; i < grid.size(); i++) {

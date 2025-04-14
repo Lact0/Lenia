@@ -90,7 +90,7 @@ vector<int> mapColBGR(double n) {
 }
 
 void drawCreature(vector<double>* grid, double offsetX, double offsetY) {
-    for(int i = 0; i < 20; i++) {
+    for(int i = 0; i < 20; i++) {   
         for(int j = 0; j < 20; j++) {
             (*grid)[(i + offsetX) + (j + offsetY) * windowWidth] = creature[i][j];
         }
